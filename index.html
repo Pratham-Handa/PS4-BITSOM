@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Packaging Sustainability Analyzer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .result-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            background-color: white;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .outcome-tag {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+        }
+        .outcome-green { background-color: #dcfce7; color: #166534; }
+        .outcome-yellow { background-color: #fef9c3; color: #854d0e; }
+        .outcome-red { background-color: #fee2e2; color: #991b1b; }
+        .outcome-gray { background-color: #f3f4f6; color: #4b5563; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-4xl">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900">Packaging Sustainability Analyzer</h1>
+            <p class="mt-2 text-md text-gray-600">Get city-specific recyclability data and strategic insights for your packaging choices in India.</p>
+        </header>
+
+        <main>
+            <div class="bg-white p-6 rounded-xl shadow-md mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                    <div class="md:col-span-1">
+                        <label for="material-select" class="block text-sm font-medium text-gray-700 mb-1">Select Material</label>
+                        <select id="material-select" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                            <!-- Options will be populated by JS -->
+                        </select>
+                    </div>
+                    <div>
+                        <label for="city-input" class="block text-sm font-medium text-gray-700 mb-1">Enter City</label>
+                        <input type="text" id="city-input" value="Mumbai" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g., Mumbai, Delhi, Pune...">
+                    </div>
+                    <button id="analyze-btn" class="w-full bg-indigo-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 shadow-sm transition-colors duration-200">
+                        Analyze
+                    </button>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div id="results-container" class="hidden">
+                <!-- Localized Outcome -->
+                <div id="outcome-card" class="result-card">
+                    <h2 class="text-xl font-bold mb-2 text-gray-900">Localized Recyclability Outcome</h2>
+                    <div class="flex items-center space-x-4">
+                        <p id="outcome-tag" class="outcome-tag"></p>
+                        <p id="outcome-notes" class="text-gray-600"></p>
+                    </div>
+                </div>
+                
+                <!-- Sustainable Alternatives -->
+                <div id="alternatives-card" class="result-card">
+                    <h2 class="text-xl font-bold mb-4 text-gray-900">Sustainable Alternatives</h2>
+                    <div id="alternatives-list" class="space-y-4"></div>
+                </div>
+
+                <!-- Strategic Insights Dashboard -->
+                <div class="result-card bg-gray-900 text-white">
+                    <h2 class="text-2xl font-bold mb-4 text-center">Strategic Insights Dashboard</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- ESG / SDG -->
+                        <div class="bg-gray-800 p-4 rounded-lg">
+                            <h3 class="font-semibold text-lg mb-2 text-indigo-300">📈 ESG & SDG Alignment</h3>
+                            <div id="esg-list" class="space-y-3 text-sm"></div>
+                        </div>
+                         <!-- Marketing -->
+                        <div class="bg-gray-800 p-4 rounded-lg">
+                            <h3 class="font-semibold text-lg mb-2 text-indigo-300">📢 Marketing & Brand Image</h3>
+                            <p id="marketing-point" class="text-sm"></p>
+                        </div>
+                        <!-- Investor -->
+                        <div class="bg-gray-800 p-4 rounded-lg">
+                            <h3 class="font-semibold text-lg mb-2 text-indigo-300">💼 Investor Relations</h3>
+                            <p id="investor-point" class="text-sm"></p>
+                        </div>
+                         <!-- Compliance -->
+                        <div class="bg-gray-800 p-4 rounded-lg">
+                            <h3 class="font-semibold text-lg mb-2 text-indigo-300">📜 Compliance & Regulations</h3>
+                            <div id="compliance-list" class="space-y-3 text-sm"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+             <div id="error-container" class="hidden text-center p-4 bg-red-100 text-red-700 rounded-lg"></div>
+        </main>
+    </div>
+
+<script>
+// --- EMBEDDED MOCK DATABASES ---
+
+const materials_db = [
+    { "mat_id": "pet01", "name": "PET Bottle", "category": "Plastic" },
+    { "mat_id": "hdpe02", "name": "HDPE Jug", "category": "Plastic" },
+    { "mat_id": "ldpe04", "name": "LDPE Film", "category": "Plastic" },
+    { "mat_id": "pp05", "name": "PP Container", "category": "Plastic" },
+    { "mat_id": "paper01", "name": "Corrugated Cardboard", "category": "Paper" },
+    { "mat_id": "glass01", "name": "Glass Jar", "category": "Glass" },
+    { "mat_id": "compost01", "name": "Compostable PLA Cup", "category": "Compostable" }
+];
+
+const recycling_infra_db = {
+    "mumbai": {
+        "pet01": { "outcome": "Widely Recycled", "notes": "Strong formal and informal collection infrastructure. High demand for recycled PET flakes." },
+        "hdpe02": { "outcome": "Widely Recycled", "notes": "Well-established recycling stream for rigid HDPE." },
+        "ldpe04": { "outcome": "Limited Recyclability", "notes": "Low value and difficult to process. Clogs machinery. Mostly landfilled or incinerated." },
+        "paper01": { "outcome": "Widely Recycled", "notes": "Mature paper recycling industry in the region." },
+        "glass01": { "outcome": "Moderately Recycled", "notes": "Collection exists, but contamination with ceramics can be an issue. Color sorting is limited." },
+        "compost01": { "outcome": "Not Recycled/Composted", "notes": "No widespread industrial composting facility available for public/commercial waste streams in the MMR." }
+    },
+    "delhi": {
+        "pet01": { "outcome": "Widely Recycled", "notes": "Extensive network of collectors and processors." },
+        "hdpe02": { "outcome": "Widely Recycled", "notes": "Similar to Mumbai, strong recycling infrastructure." },
+        "ldpe04": { "outcome": "Limited Recyclability", "notes": "Mostly downcycled into low-grade products or sent to waste-to-energy plants." },
+        "paper01": { "outcome": "Widely Recycled", "notes": "High rate of recovery for cardboard and paper." },
+        "compost01": { "outcome": "Not Recycled/Composted", "notes": "Lack of source segregation and industrial composting facilities makes PLA non-viable." }
+    },
+    "pune": {
+        "pet01": { "outcome": "Widely Recycled", "notes": "Good collection and segregation systems in place." },
+        "paper01": { "outcome": "Widely Recycled", "notes": "Efficient collection from commercial and residential sources." },
+        "compost01": { "outcome": "Pilot Program Available", "notes": "A few industrial composting facilities exist that may accept certified compostable PLA from B2B clients by arrangement." }
+    },
+    "nagpur": {
+        "pet01": { "outcome": "Moderately Recycled", "notes": "Collection infrastructure is present but less efficient than in metro cities." },
+        "hdpe02": { "outcome": "Moderately Recycled", "notes": "Recycling exists but scale is smaller." },
+        "ldpe04": { "outcome": "Not Recycled", "notes": "No viable recycling stream available. Ends up in landfill." },
+        "paper01": { "outcome": "Widely Recycled", "notes": "Good collection network for paper and cardboard." }
+    }
+};
+
+const alternatives_db = {
+    "pet01": [{ "alt_name": "Recycled PET (rPET)", "cost_factor": 1.15, "pros": ["Reduces virgin plastic use by 75%", "Lower carbon footprint", "Supports circular economy", "Positive marketing story"], "cons": ["Slightly higher cost", "Requires reliable source of high-quality recycled material"] }, { "alt_name": "Glass Bottle", "cost_factor": 1.4, "pros": ["Infinitely recyclable", "Perceived as premium by customers", "Inert and excellent for preserving product integrity"], "cons": ["Heavier, increasing transport costs and emissions", "Higher initial cost", "Breakable"] }],
+    "ldpe04": [{ "alt_name": "Certified Compostable Film (e.g., from Corn Starch)", "cost_factor": 2.5, "pros": ["Breaks down in industrial compost", "Made from renewable resources", "Strong 'plastic-free' marketing claim"], "cons": ["Significantly higher cost", "Requires consumers to have access to industrial composting", "Looks like plastic, can cause confusion"] }, { "alt_name": "Recycled Kraft Paper Mailer", "cost_factor": 1.8, "pros": ["Easily recyclable for the end consumer", "Good branding surface", "Plastic-free"], "cons": ["Not waterproof", "Less durable for heavy or sharp items"] }],
+    "paper01": [{ "alt_name": "Higher Recycled Content Cardboard (90%+)", "cost_factor": 1.05, "pros": ["Maximizes use of recycled fiber", "Strengthens sustainability claims", "Minimal cost increase"], "cons": ["Slightly lower strength compared to virgin fiber boards"] }]
+};
+
+const regulations_db = [
+    { "name": "Plastic Waste Management (PWM) Rules, 2022 (India)", "summary": "Prohibits the manufacture, import, stocking, distribution, sale and use of identified single-use plastic (SUP) items. Mandates increased thickness for plastic carry bags and introduces Extended Producer Responsibility (EPR) for producers, importers & brand owners.", "relevance": "Directly impacts packaging choices, especially for films, cutlery, and secondary packaging. Non-compliance can lead to significant penalties." },
+    { "name": "EU Packaging and Packaging Waste Regulation (PPWR)", "summary": "Sets ambitious targets for recyclability, minimum recycled content in new plastic packaging, and waste reduction for any goods sold within the European Union.", "relevance": "CRITICAL for any business exporting to the EU. Packaging must be designed for recyclability in the destination country to gain market access." }
+];
+
+const esg_sdg_db = {
+    "Plastic": [ { "action": "Switching from virgin plastic to recycled content (rPET, rHDPE)", "sdg_alignment": "SDG 12: Responsible Consumption and Production", "investor_point": "Demonstrates a move towards a circular economy model, reducing reliance on volatile fossil fuel feedstocks.", "marketing_point": "Our packaging is now made with X% recycled materials, giving old plastic a new life." }, { "action": "Reducing overall plastic weight through design optimization ('light-weighting')", "sdg_alignment": "SDG 13: Climate Action", "investor_point": "Shows operational efficiency and commitment to reducing Scope 3 emissions from transportation and material production.", "marketing_point": "We've redesigned our packaging to use 20% less plastic, reducing our carbon footprint." } ],
+    "Paper": [{ "action": "Ensuring all paper/cardboard is FSC Certified", "sdg_alignment": "SDG 15: Life on Land", "investor_point": "Guarantees responsible sourcing, mitigating deforestation risks in the supply chain.", "marketing_point": "All our boxes come from responsibly managed forests." }],
+    "Compostable": [{ "action": "Adopting certified compostable packaging where viable infrastructure exists", "sdg_alignment": "SDG 11: Sustainable Cities and Communities", "investor_point": "Positions the company as an innovator exploring next-generation materials that can reduce landfill burden.", "marketing_point": "Our new cups are fully compostable, returning to the earth without a trace." }]
+};
+
+// --- APPLICATION LOGIC ---
+
+document.addEventListener('DOMContentLoaded', () => {
+    const materialSelect = document.getElementById('material-select');
+    const cityInput = document.getElementById('city-input');
+    const analyzeBtn = document.getElementById('analyze-btn');
+    const resultsContainer = document.getElementById('results-container');
+    const errorContainer = document.getElementById('error-container');
+
+    // Populate material dropdown
+    materials_db.forEach(mat => {
+        const option = document.createElement('option');
+        option.value = mat.name;
+        option.textContent = mat.name;
+        materialSelect.appendChild(option);
+    });
+
+    analyzeBtn.addEventListener('click', () => {
+        const materialName = materialSelect.value;
+        const cityName = cityInput.value;
+
+        if (!cityName.trim()) {
+            displayError("Please enter a city name.");
+            return;
+        }
+        
+        const analysis = analyzePackaging(materialName, cityName);
+        
+        if (analysis.error) {
+            displayError(analysis.error);
+        } else {
+            displayResults(analysis);
+        }
+    });
+    
+    function displayError(message) {
+        resultsContainer.classList.add('hidden');
+        errorContainer.textContent = message;
+        errorContainer.classList.remove('hidden');
+    }
+
+    function displayResults(data) {
+        errorContainer.classList.add('hidden');
+        
+        // Localized outcome
+        const outcomeTag = document.getElementById('outcome-tag');
+        const outcomeNotes = document.getElementById('outcome-notes');
+        const outcome = data.localized_outcome.outcome;
+        outcomeTag.textContent = outcome;
+        outcomeTag.className = 'outcome-tag'; // reset classes
+        if (outcome.includes('Widely')) outcomeTag.classList.add('outcome-green');
+        else if (outcome.includes('Moderately') || outcome.includes('Limited') || outcome.includes('Pilot')) outcomeTag.classList.add('outcome-yellow');
+        else if (outcome.includes('Not')) outcomeTag.classList.add('outcome-red');
+        else outcomeTag.classList.add('outcome-gray');
+        outcomeNotes.textContent = data.localized_outcome.notes;
+
+        // Alternatives
+        const alternativesList = document.getElementById('alternatives-list');
+        alternativesList.innerHTML = '';
+        if (data.sustainable_alternatives.length > 0) {
+            data.sustainable_alternatives.forEach(alt => {
+                const prosList = alt.pros.map(p => `<li class="text-green-300"><span class="text-green-400 font-bold">+</span> ${p}</li>`).join('');
+                const consList = alt.cons.map(c => `<li class="text-red-300"><span class="text-red-400 font-bold">-</span> ${c}</li>`).join('');
+                const altDiv = document.createElement('div');
+                altDiv.className = 'p-4 rounded-lg bg-gray-50 border';
+                altDiv.innerHTML = `
+                    <h4 class="font-bold text-lg text-indigo-700">${alt.alt_name}</h4>
+                    <p class="text-sm text-gray-500 mb-3">Estimated Cost Factor: ${alt.cost_factor}x</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm bg-gray-900 text-white p-3 rounded-md">
+                        <div>
+                            <h5 class="font-semibold mb-1 text-green-400">Pros</h5>
+                            <ul class="list-none space-y-1">${prosList}</ul>
+                        </div>
+                        <div>
+                            <h5 class="font-semibold mb-1 text-red-400">Cons</h5>
+                            <ul class="list-none space-y-1">${consList}</ul>
+                        </div>
+                    </div>
+                `;
+                alternativesList.appendChild(altDiv);
+            });
+        } else {
+            alternativesList.innerHTML = `<p class="text-gray-500">No specific alternatives listed for this material.</p>`;
+        }
+        
+        // Strategic Insights
+        document.getElementById('marketing-point').textContent = data.strategic_insights.marketing_advantage;
+        document.getElementById('investor-point').textContent = data.strategic_insights.investor_relations;
+
+        // ESG List
+        const esgList = document.getElementById('esg-list');
+        esgList.innerHTML = '';
+        if(data.strategic_insights.esg_reporting_points.length > 0) {
+            data.strategic_insights.esg_reporting_points.forEach(point => {
+                const esgItem = document.createElement('div');
+                esgItem.innerHTML = `<p class="font-semibold">${point.action}</p><p class="text-indigo-400 text-xs">${point.sdg_alignment}</p>`;
+                esgList.appendChild(esgItem);
+            });
+        }
+        
+        // Compliance List
+        const complianceList = document.getElementById('compliance-list');
+        complianceList.innerHTML = '';
+        data.compliance_updates.national_regulations.forEach(reg => {
+            const regItem = document.createElement('div');
+            regItem.innerHTML = `<p class="font-semibold">${reg.name}</p><p class="text-gray-400 text-xs">${reg.relevance}</p>`;
+            complianceList.appendChild(regItem);
+        });
+
+        resultsContainer.classList.remove('hidden');
+    }
+
+    function analyzePackaging(materialName, cityName) {
+        const material = materials_db.find(m => m.name.toLowerCase() === materialName.toLowerCase());
+        if (!material) {
+            return { error: `Material '${materialName}' not found.` };
+        }
+
+        const city_name_lower = cityName.toLowerCase();
+        const mat_id = material.mat_id;
+
+        const city_infra = recycling_infra_db[city_name_lower];
+        if (!city_infra) {
+            return { error: `Data for city '${cityName}' not found. Try Mumbai, Delhi, Pune, or Nagpur.` };
+        }
+        
+        const recyclability_info = city_infra[mat_id] || {
+            "outcome": "Data Unavailable",
+            "notes": "No specific recycling data for this material in this city."
+        };
+
+        const sustainable_swaps = alternatives_db[mat_id] || [];
+        const esg_points = esg_sdg_db[material.category] || [];
+
+        return {
+            query: { material: material.name, city: cityName },
+            localized_outcome: recyclability_info,
+            sustainable_alternatives: sustainable_swaps,
+            strategic_insights: {
+                esg_reporting_points: esg_points,
+                marketing_advantage: `Highlighting a switch from ${material.name} to a sustainable alternative improves brand perception.`,
+                investor_relations: "Demonstrating proactive management of packaging waste strengthens ESG credentials."
+            },
+            compliance_updates: {
+                national_regulations: regulations_db
+            }
+        };
+    }
+});
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,44 @@
+[
+    {
+        "mat_id": "pet01",
+        "name": "PET Bottle",
+        "category": "Plastic",
+        "description": "Polyethylene terephthalate, commonly used for water and beverage bottles. (Plastic #1)"
+    },
+    {
+        "mat_id": "hdpe02",
+        "name": "HDPE Jug",
+        "category": "Plastic",
+        "description": "High-density polyethylene, used for milk jugs, shampoo bottles. (Plastic #2)"
+    },
+    {
+        "mat_id": "ldpe04",
+        "name": "LDPE Film",
+        "category": "Plastic",
+        "description": "Low-density polyethylene, used for plastic bags and films. (Plastic #4)"
+    },
+    {
+        "mat_id": "pp05",
+        "name": "PP Container",
+        "category": "Plastic",
+        "description": "Polypropylene, used for food containers, yogurt tubs. (Plastic #5)"
+    },
+    {
+        "mat_id": "paper01",
+        "name": "Corrugated Cardboard",
+        "category": "Paper",
+        "description": "Standard shipping boxes and cartons."
+    },
+    {
+        "mat_id": "glass01",
+        "name": "Glass Jar",
+        "category": "Glass",
+        "description": "Container for food items like jams and pickles."
+    },
+    {
+        "mat_id": "compost01",
+        "name": "Compostable PLA Cup",
+        "category": "Compostable",
+        "description": "Polylactic acid, a bioplastic made from renewable resources. Requires industrial composting."
+    }
+]
