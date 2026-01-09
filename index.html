@@ -83,6 +83,8 @@
 </div>
 
 <script>
+const BACKEND_URL = "https://ps4-bitsom.onrender.com";
+
 function toggleExplain() {
   document.getElementById("explain").classList.toggle("hidden");
 }
@@ -97,12 +99,12 @@ async function analyze() {
     const formData = new FormData();
     formData.append("image", image);
 
-    response = await fetch("http://127.0.0.1:5000/analyze-image", {
+    response = await fetch(`${BACKEND_URL}/analyze-image`, {
       method: "POST",
       body: formData
     });
   } else {
-    response = await fetch("http://127.0.0.1:5000/analyze", {
+    response = await fetch(`${BACKEND_URL}/analyze`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ text })
@@ -131,7 +133,7 @@ async function analyze() {
   if (data.environmentalBert.environmentalClaim) {
     document.getElementById("bert").innerHTML =
       data.environmentalBert.raw.map(r =>
-        `• Claim confidence: ${(r.score * 100).toFixed(1)}%`
+        `• Sustainability claim confidence: ${(r.score * 100).toFixed(1)}%`
       ).join("<br>");
   } else {
     document.getElementById("bert").innerText =
