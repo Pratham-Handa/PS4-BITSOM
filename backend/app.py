@@ -1,283 +1,235 @@
-# =====================================================
-# EcoStyle Agent Backend (Production Ready)
-# EcoScore: Lifecycle Index (0–30)
-# =====================================================
+# EcoStyle Agent Backend
+# Production-ready with Google Vision OCR + Explainable AI
+# Python 3.10 compatible
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from transformers import pipeline
-from PIL import Image
-import pytesseract
-import io
-import random
 import logging
-import requests
-import json
 import os
-import signal
-import sys
+import json
+import requests
 
-# =====================================================
-# ENV CONFIG
-# =====================================================
+# Google Vision
+from google.cloud import vision
 
-SERPER_API_KEY = os.getenv("SERPER_API_KEY")
+# Transformers (EnvironmentalBERT)
+from transformers import pipeline
 
-pytesseract.pytesseract.tesseract_cmd = (
-    r"C:\Program Files\Tesseract-OCR\tesseract.exe"
-)
-
-MAX_ECOSCORE = 30
-ENV_CLAIM_BONUS = 2
-WEB_VERIFICATION_BONUS = 1
-WEB_VERIFICATION_CAP = 2
-
-# =====================================================
-# LOGGING
-# =====================================================
-
+# -----------------------------
+# Logging
+# -----------------------------
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s | %(levelname)s | %(message)s"
 )
 logger = logging.getLogger("EcoStyleAgent")
 
-# =====================================================
-# APP INIT
-# =====================================================
-
+# -----------------------------
+# App Init
+# -----------------------------
 app = Flask(__name__)
 CORS(app)
 
-logger.info("🚀 EcoStyle Agent booting up")
-
-# =====================================================
-# LOAD AI MODEL
-# =====================================================
+# -----------------------------
+# Google Vision Init
+# -----------------------------
+vision_client = None
 
 try:
-    claim_classifier = pipeline(
+    creds_json = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS_JSON")
+    if creds_json:
+        creds_dict = json.loads(creds_json)
+        vision_client = vision.ImageAnnotatorClient.from_service_account_info(
+            creds_dict
+        )
+        logger.info("✅ Google Vision OCR initialized")
+    else:
+        logger.warning("⚠️ Google Vision credentials not found")
+except Exception as e:
+    logger.error(f"❌ Vision init failed: {e}")
+
+# -----------------------------
+# EnvironmentalBERT Init
+# -----------------------------
+try:
+    env_bert = pipeline(
         "text-classification",
-        model="ESGBERT/EnvironmentalBERT-environmental"
+        model="ESGBERT/EnvironmentalBERT-environmental",
+        top_k=None
     )
     logger.info("✅ EnvironmentalBERT loaded")
 except Exception as e:
-    logger.error(f"❌ Failed to load EnvironmentalBERT: {e}")
-    claim_classifier = None
+    env_bert = None
+    logger.error(f"❌ EnvironmentalBERT failed: {e}")
 
-# =====================================================
-# LOAD ANCHOR PILLAR (fibers.json)
-# =====================================================
+# -----------------------------
+# Anchor Pillar (EcoScore out of 30)
+# -----------------------------
+FIBER_DB = {
+    "cotton": 13,
+    "organic cotton": 23,
+    "linen": 28,
+    "hemp": 28,
+    "polyester": 17,
+    "recycled polyester": 22,
+    "viscose": 16,
+    "tencel": 23,
+    "lyocell": 24,
+    "nylon": 14,
+    "wool": 16,
+    "silk": 14
+}
 
-with open("data/fibers.json", "r", encoding="utf-8") as f:
-    material_database = json.load(f)
-
-logger.info(f"📚 Loaded {len(material_database)} fiber entries")
-
-# =====================================================
-# OCR
-# =====================================================
-
+# -----------------------------
+# OCR via Google Vision
+# -----------------------------
 def extract_text_from_image(image_bytes):
-    try:
-        image = Image.open(io.BytesIO(image_bytes))
-        return pytesseract.image_to_string(image).strip()
-    except Exception as e:
-        logger.error(f"❌ OCR error: {e}")
+    if not vision_client:
         return ""
 
-# =====================================================
-# WEB VERIFICATION (MARKET PILLAR)
-# =====================================================
-
-def run_web_verification(query):
-    if not SERPER_API_KEY:
-        logger.warning("⚠️ SERPER_API_KEY not set — skipping web verification")
-        return []
-
-    logger.info(f"🌐 Web search triggered: {query}")
-
-    headers = {
-        "X-API-KEY": SERPER_API_KEY,
-        "Content-Type": "application/json"
-    }
-
-    payload = {"q": query, "num": 3}
-
     try:
-        res = requests.post(
-            "https://google.serper.dev/search",
-            headers=headers,
-            json=payload,
-            timeout=5
-        )
-        data = res.json()
+        image = vision.Image(content=image_bytes)
+        response = vision_client.text_detection(image=image)
 
-        return [
-            {
-                "title": r.get("title"),
-                "snippet": r.get("snippet"),
-                "link": r.get("link")
-            }
-            for r in data.get("organic", [])
-        ]
+        if response.error.message:
+            logger.error(f"Vision API error: {response.error.message}")
+            return ""
+
+        texts = response.text_annotations
+        extracted = texts[0].description if texts else ""
+        logger.info("🔍 Google Vision OCR success")
+        return extracted.strip()
 
     except Exception as e:
-        logger.error(f"❌ Web search failed: {e}")
+        logger.error(f"OCR failure: {e}")
+        return ""
+
+# -----------------------------
+# Web Verification (Serper.dev optional)
+# -----------------------------
+def web_verification(query):
+    api_key = os.environ.get("SERPER_API_KEY")
+    if not api_key:
         return []
 
-# =====================================================
-# ADVICE (RULE-BASED, STABLE)
-# =====================================================
+    try:
+        resp = requests.post(
+            "https://google.serper.dev/search",
+            headers={
+                "X-API-KEY": api_key,
+                "Content-Type": "application/json"
+            },
+            json={"q": query}
+        )
+        data = resp.json()
+        return data.get("organic", [])[:3]
+    except Exception as e:
+        logger.warning(f"Web search failed: {e}")
+        return []
 
-def generate_tip(score):
-    if score >= 24:
-        return "Excellent choice. Focus on durability and mindful care."
-    elif score >= 18:
-        return "Fairly sustainable. Washing less and air-drying helps."
-    elif score >= 12:
-        return "Moderate impact. Consider natural or recycled fibers."
-    else:
-        return "High impact. Prefer hemp, linen, or recycled materials."
-
-# =====================================================
-# OCR FALLBACK
-# =====================================================
-
-def fallback_reasoning():
-    logger.warning("⚠️ OCR failed → fallback reasoning used")
-    fiber = random.choice(list(material_database.values()))
-    return analyze_text_core(
-        f"approximate fabric detected: {fiber['displayName']}",
-        fallback_used=True,
-        fallback_reason="OCR confidence too low"
-    )
-
-# =====================================================
-# CORE AGENT LOGIC
-# =====================================================
-
-def analyze_text_core(input_text, fallback_used=False, fallback_reason=None):
-
-    if not claim_classifier:
-        return jsonify({"error": "EnvironmentalBERT unavailable"}), 500
-
-    logger.info(f"🧠 Reasoning on input: {input_text}")
-
-    # EnvironmentalBERT
-    bert_raw = claim_classifier(input_text)
-    is_claim = any(
-        r["label"] == "environmental" and r["score"] > 0.5
-        for r in bert_raw
-    )
+# -----------------------------
+# Core Analysis
+# -----------------------------
+def analyze_text_logic(text, fallback_used=False, fallback_reason=None):
+    lower = text.lower()
 
     # Anchor Pillar
-    matched = []
-    total_score = 0
+    materials = []
+    scores = []
 
-    lower = input_text.lower()
-    for key, fiber in material_database.items():
-        aliases = fiber.get("includes", []) + [key]
-        if any(a.lower() in lower for a in aliases):
-            matched.append({
-                "name": fiber["displayName"],
-                "ecoScore": fiber["ecoScore"],
-                "certifications": fiber["certifications"],
-                "biodegradable": fiber["biodegradable"],
-                "recyclable": fiber["recyclable"]
+    for fiber, score in FIBER_DB.items():
+        if fiber in lower:
+            materials.append({
+                "name": fiber,
+                "ecoScore": score
             })
-            total_score += fiber["ecoScore"]
+            scores.append(score)
 
-    # Web search (material-based)
-    web = []
-    if matched:
-        web = run_web_verification(
-            f"{matched[0]['name']} environmental impact sustainability"
-        )
-
-    # Scoring
-    if not matched:
-        score = 15
-    else:
-        score = round(total_score / len(matched), 1)
-        if is_claim:
-            score += ENV_CLAIM_BONUS
-        score += min(len(web), WEB_VERIFICATION_CAP)
-        score = min(score, MAX_ECOSCORE)
+    overall_score = round(sum(scores) / len(scores)) if scores else 15
 
     # Summary
-    if score >= 24:
+    if overall_score >= 25:
         summary = "Excellent Choice"
-    elif score >= 18:
+    elif overall_score >= 20:
         summary = "Good Choice"
-    elif score >= 12:
+    elif overall_score >= 15:
         summary = "Could Be Better"
     else:
         summary = "Consider Alternatives"
 
+    # EnvironmentalBERT
+    bert_result = {
+        "environmentalClaim": False,
+        "raw": []
+    }
+
+    if env_bert:
+        raw = env_bert(text)
+        bert_result["raw"] = raw
+        bert_result["environmentalClaim"] = any(
+            r["label"].lower() == "environmental" and r["score"] > 0.5
+            for r in raw
+        )
+
+    # Web Search
+    web_sources = web_verification(text)
+
+    # Tip
+    if overall_score < 15:
+        tip = "High environmental impact. Prefer materials like hemp, linen, or recycled fibers."
+    elif overall_score < 20:
+        tip = "Moderate impact. Look for certified or recycled alternatives."
+    else:
+        tip = "Good choice. Prefer durability and low-impact care."
+
     return jsonify({
-        "overallScore": score,
-        "scoreScale": "/30",
+        "overallScore": overall_score,
         "summary": summary,
-        "materials": matched,
-        "recommendation": generate_tip(score),
-        "environmentalBert": {
-            "environmentalClaim": is_claim,
-            "raw": bert_raw
-        },
-        "webVerification": web,
+        "recommendation": tip,
+        "materials": materials,
+        "environmentalBert": bert_result,
+        "webVerification": web_sources,
         "fallbackUsed": fallback_used,
         "fallbackReason": fallback_reason
     })
 
-# =====================================================
-# ROUTES
-# =====================================================
-
-@app.route("/")
-def root():
-    return jsonify({
-        "service": "EcoStyle Agent",
-        "status": "running",
-        "version": "1.0"
-    })
-
-@app.route("/health")
+# -----------------------------
+# Routes
+# -----------------------------
+@app.route("/health", methods=["GET"])
 def health():
     return jsonify({"status": "ok"})
 
 @app.route("/analyze", methods=["POST"])
 def analyze_text():
     data = request.get_json()
-    if not data or not data.get("text"):
+    text = data.get("text", "").strip()
+
+    if not text:
         return jsonify({"error": "No text provided"}), 400
-    return analyze_text_core(data["text"])
+
+    return analyze_text_logic(text)
 
 @app.route("/analyze-image", methods=["POST"])
 def analyze_image():
     if "image" not in request.files:
         return jsonify({"error": "No image uploaded"}), 400
 
-    text = extract_text_from_image(request.files["image"].read())
-    if not text:
-        return fallback_reasoning()
-    return analyze_text_core(text)
+    image_bytes = request.files["image"].read()
+    extracted = extract_text_from_image(image_bytes)
 
-# =====================================================
-# GRACEFUL SHUTDOWN
-# =====================================================
+    if not extracted:
+        return analyze_text_logic(
+            "",
+            fallback_used=True,
+            fallback_reason="OCR failed, insufficient readable text"
+        )
 
-def shutdown_handler(sig, frame):
-    logger.info("🛑 EcoStyle Agent shutting down gracefully")
-    sys.exit(0)
+    return analyze_text_logic(extracted)
 
-signal.signal(signal.SIGTERM, shutdown_handler)
-signal.signal(signal.SIGINT, shutdown_handler)
-
-# =====================================================
-# RUN
-# =====================================================
-
+# -----------------------------
+# Run
+# -----------------------------
 if __name__ == "__main__":
-    logger.info("✅ EcoStyle Agent ready")
-    app.run(host="0.0.0.0", port=10000)
+    logger.info("🚀 EcoStyle Agent running")
+    app.run(host="0.0.0.0", port=5000)

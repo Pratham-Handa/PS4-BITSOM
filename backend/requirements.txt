@@ -5,3 +5,4 @@ torch
 pillow
 pytesseract
 requests
+google-cloud-vision
