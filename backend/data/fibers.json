@@ -1,0 +1,197 @@
+{
+  "synthetic fibers": {
+    "displayName": "Synthetic Fibers",
+    "includes": ["polyester", "nylon", "acrylic", "elastane", "spandex"],
+    "description": "Petrochemical byproducts derived from fossil fuels",
+    "waterUsage": "Low during production, but causes microplastic water pollution",
+    "chemicalUsage": "Very high (PFAS, BPA, toxic additives)",
+    "carbonImpact": "Very high (≈2.5 tons CO₂ per ton plastic)",
+    "landImpact": "Moderate (oil extraction)",
+    "biodegradable": false,
+    "recyclable": "Limited",
+    "certifications": ["GRS", "Repreve", "Econyl"],
+    "ecoScore": 17
+  },
+
+  "cotton (conventional)": {
+    "displayName": "Cotton (Conventional)",
+    "includes": ["cotton"],
+    "description": "Plant-based natural fiber grown using intensive agriculture",
+    "waterUsage": "Extremely high (~10,000 L/kg fabric)",
+    "chemicalUsage": "Extremely high (pesticides, insecticides)",
+    "carbonImpact": "High",
+    "landImpact": "High (soil depletion, freshwater use)",
+    "biodegradable": true,
+    "recyclable": "Limited",
+    "certifications": ["OEKO-TEX"],
+    "ecoScore": 13
+  },
+
+  "cotton (organic)": {
+    "displayName": "Cotton (Organic)",
+    "includes": ["organic cotton", "regenerative cotton"],
+    "description": "Cotton grown without synthetic pesticides or fertilizers",
+    "waterUsage": "91% less than conventional cotton",
+    "chemicalUsage": "Low to none",
+    "carbonImpact": "Moderate (42–46% lower than conventional)",
+    "landImpact": "Regenerative",
+    "biodegradable": true,
+    "recyclable": "Limited",
+    "certifications": ["GOTS", "OCS", "OEKO-TEX"],
+    "ecoScore": 23
+  },
+
+  "bast fibers": {
+    "displayName": "Bast Fibers",
+    "includes": ["linen", "hemp", "jute", "ramie", "flax"],
+    "description": "Fibers from inner bark of plants",
+    "waterUsage": "Very low",
+    "chemicalUsage": "Very low",
+    "carbonImpact": "Carbon negative",
+    "landImpact": "Positive (soil regeneration)",
+    "biodegradable": true,
+    "recyclable": "Not required",
+    "certifications": ["GOTS", "European Flax"],
+    "ecoScore": 28
+  },
+
+  "semi-synthetic mmcf": {
+    "displayName": "Semi-Synthetic MMCF",
+    "includes": ["viscose", "rayon", "modal", "cupro"],
+    "description": "Chemically processed plant cellulose fibers",
+    "waterUsage": "Moderate",
+    "chemicalUsage": "High (caustic soda, ammonia, sulfuric acid)",
+    "carbonImpact": "Moderate",
+    "landImpact": "Forest dependent",
+    "biodegradable": true,
+    "recyclable": true,
+    "certifications": ["FSC", "Lenzing"],
+    "ecoScore": 16
+  },
+
+  "lyocell": {
+    "displayName": "Lyocell (TENCEL™)",
+    "includes": ["lyocell", "tencel"],
+    "description": "Closed-loop regenerated fiber from eucalyptus",
+    "waterUsage": "Very low",
+    "chemicalUsage": "Minimal (closed-loop)",
+    "carbonImpact": "Low",
+    "landImpact": "Sustainable forestry",
+    "biodegradable": true,
+    "recyclable": true,
+    "certifications": ["FSC", "PEFC", "TENCEL"],
+    "ecoScore": 27
+  },
+
+  "animal fibers": {
+    "displayName": "Animal Fibers",
+    "includes": ["wool", "alpaca", "cashmere", "silk", "yak", "camel", "qiviut"],
+    "description": "Fibers sourced from animals",
+    "waterUsage": "Moderate to high",
+    "chemicalUsage": "Moderate",
+    "carbonImpact": "High (methane emissions)",
+    "landImpact": "High (grazing)",
+    "biodegradable": true,
+    "recyclable": "Limited",
+    "certifications": ["RWS", "GCS", "ZQ", "Woolmark"],
+    "ecoScore": 16
+  },
+
+  "cashmere": {
+    "displayName": "Cashmere",
+    "includes": ["cashmere"],
+    "description": "Luxury fiber from goat undercoat",
+    "waterUsage": "High",
+    "chemicalUsage": "Moderate",
+    "carbonImpact": "High",
+    "landImpact": "Extremely high (overgrazing)",
+    "biodegradable": true,
+    "recyclable": "Limited",
+    "certifications": ["Good Cashmere Standard"],
+    "ecoScore": 15
+  },
+
+  "silk": {
+    "displayName": "Silk",
+    "includes": ["silk"],
+    "description": "Fiber from silkworm cocoons",
+    "waterUsage": "High",
+    "chemicalUsage": "High",
+    "carbonImpact": "Moderate",
+    "landImpact": "High",
+    "biodegradable": true,
+    "recyclable": "Limited",
+    "certifications": ["GOTS", "OEKO-TEX"],
+    "ecoScore": 14
+  },
+
+  "peace silk": {
+    "displayName": "Peace / Ahimsa Silk",
+    "includes": ["peace silk", "ahimsa silk"],
+    "description": "Silk harvested without killing silkworms",
+    "waterUsage": "High",
+    "chemicalUsage": "High",
+    "carbonImpact": "Moderate",
+    "landImpact": "High",
+    "biodegradable": true,
+    "recyclable": "Limited",
+    "certifications": ["GOTS", "Fair Trade"],
+    "ecoScore": 14
+  },
+
+  "leather": {
+    "displayName": "Leather (Conventional)",
+    "includes": ["leather"],
+    "description": "Animal hides processed with chemical tanning",
+    "waterUsage": "Very high",
+    "chemicalUsage": "Extremely high (chromium tanning)",
+    "carbonImpact": "Extremely high",
+    "landImpact": "Extremely high",
+    "biodegradable": "Limited",
+    "recyclable": "Very limited",
+    "certifications": ["LWG", "ZDHC", "OEKO-TEX"],
+    "ecoScore": 10
+  },
+
+  "plant-based leather": {
+    "displayName": "Plant-Based Leather",
+    "includes": ["pinatex", "mycelium", "cactus leather", "apple leather"],
+    "description": "Leather alternatives from plant or food waste",
+    "waterUsage": "Low",
+    "chemicalUsage": "Low",
+    "carbonImpact": "Low",
+    "landImpact": "Positive",
+    "biodegradable": "Mostly",
+    "recyclable": "Limited",
+    "certifications": ["Piñatex", "MycoWorks", "Desserto"],
+    "ecoScore": 27
+  },
+
+  "recycled polyester": {
+    "displayName": "Recycled Polyester (rPET)",
+    "includes": ["recycled polyester", "rpet"],
+    "description": "Polyester made from recycled plastic waste",
+    "waterUsage": "Lower than virgin polyester",
+    "chemicalUsage": "Lower",
+    "carbonImpact": "Up to 75% lower than virgin polyester",
+    "landImpact": "Low",
+    "biodegradable": false,
+    "recyclable": true,
+    "certifications": ["GRS", "RCS"],
+    "ecoScore": 22
+  },
+
+  "recycled nylon": {
+    "displayName": "Recycled Nylon",
+    "includes": ["recycled nylon", "econyl"],
+    "description": "Regenerated nylon from fishing nets and waste",
+    "waterUsage": "Lower than virgin nylon",
+    "chemicalUsage": "Lower",
+    "carbonImpact": "Lower than virgin nylon",
+    "landImpact": "Low",
+    "biodegradable": false,
+    "recyclable": true,
+    "certifications": ["Econyl", "GRS"],
+    "ecoScore": 22
+  }
+}
