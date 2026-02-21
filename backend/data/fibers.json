@@ -10,7 +10,19 @@
     "biodegradable": false,
     "recyclable": "Limited",
     "certifications": ["GRS", "Repreve", "Econyl"],
-    "ecoScore": 17
+    "ecoScore": 17,
+    "sources": [
+      {
+        "title": "Plastics and microplastics in textiles",
+        "link": "https://www.eea.europa.eu/publications/microplastics-from-textiles",
+        "snippet": "Synthetic textiles release microplastics into water systems during washing and wear."
+      },
+      {
+        "title": "Polyester and climate impact",
+        "link": "https://www.textileexchange.org/materials/polyester/",
+        "snippet": "Virgin polyester is derived from fossil fuels and has a high carbon footprint."
+      }
+    ]
   },
 
   "cotton (conventional)": {
@@ -24,7 +36,19 @@
     "biodegradable": true,
     "recyclable": "Limited",
     "certifications": ["OEKO-TEX"],
-    "ecoScore": 13
+    "ecoScore": 13,
+    "sources": [
+      {
+        "title": "Environmental impact of cotton",
+        "link": "https://en.wikipedia.org/wiki/Environmental_impact_of_cotton",
+        "snippet": "Cotton cultivation requires significant water and pesticide use, contributing to environmental degradation."
+      },
+      {
+        "title": "Cotton sustainability overview",
+        "link": "https://textileexchange.org/materials/cotton/",
+        "snippet": "Conventional cotton has high environmental and social impacts across its lifecycle."
+      }
+    ]
   },
 
   "cotton (organic)": {
@@ -38,7 +62,14 @@
     "biodegradable": true,
     "recyclable": "Limited",
     "certifications": ["GOTS", "OCS", "OEKO-TEX"],
-    "ecoScore": 23
+    "ecoScore": 23,
+    "sources": [
+      {
+        "title": "Benefits of organic cotton",
+        "link": "https://www.soilassociation.org/fashion-textiles/organic-cotton/",
+        "snippet": "Organic cotton reduces water usage and eliminates toxic pesticides."
+      }
+    ]
   },
 
   "bast fibers": {
@@ -52,7 +83,14 @@
     "biodegradable": true,
     "recyclable": "Not required",
     "certifications": ["GOTS", "European Flax"],
-    "ecoScore": 28
+    "ecoScore": 28,
+    "sources": [
+      {
+        "title": "Why hemp is sustainable",
+        "link": "https://textileexchange.org/materials/hemp/",
+        "snippet": "Hemp requires minimal water and no pesticides, making it one of the most sustainable fibers."
+      }
+    ]
   },
 
   "semi-synthetic mmcf": {
@@ -60,13 +98,20 @@
     "includes": ["viscose", "rayon", "modal", "cupro"],
     "description": "Chemically processed plant cellulose fibers",
     "waterUsage": "Moderate",
-    "chemicalUsage": "High (caustic soda, ammonia, sulfuric acid)",
+    "chemicalUsage": "High",
     "carbonImpact": "Moderate",
     "landImpact": "Forest dependent",
     "biodegradable": true,
     "recyclable": true,
     "certifications": ["FSC", "Lenzing"],
-    "ecoScore": 16
+    "ecoScore": 16,
+    "sources": [
+      {
+        "title": "Man-made cellulosic fibers explained",
+        "link": "https://www.canopyplanet.org/solutions/canopy-style/",
+        "snippet": "Viscose production can contribute to deforestation if not responsibly sourced."
+      }
+    ]
   },
 
   "lyocell": {
@@ -80,7 +125,14 @@
     "biodegradable": true,
     "recyclable": true,
     "certifications": ["FSC", "PEFC", "TENCEL"],
-    "ecoScore": 27
+    "ecoScore": 27,
+    "sources": [
+      {
+        "title": "What is TENCEL™ Lyocell?",
+        "link": "https://www.lenzing.com/products/tencel",
+        "snippet": "Lyocell is produced in a closed-loop process with minimal environmental impact."
+      }
+    ]
   },
 
   "animal fibers": {
@@ -94,7 +146,14 @@
     "biodegradable": true,
     "recyclable": "Limited",
     "certifications": ["RWS", "GCS", "ZQ", "Woolmark"],
-    "ecoScore": 16
+    "ecoScore": 16,
+    "sources": [
+      {
+        "title": "Environmental impact of wool",
+        "link": "https://www.textileexchange.org/materials/wool/",
+        "snippet": "Animal fibers contribute to methane emissions and land use impacts."
+      }
+    ]
   },
 
   "cashmere": {
@@ -108,7 +167,14 @@
     "biodegradable": true,
     "recyclable": "Limited",
     "certifications": ["Good Cashmere Standard"],
-    "ecoScore": 15
+    "ecoScore": 15,
+    "sources": [
+      {
+        "title": "The hidden cost of cashmere",
+        "link": "https://www.nationalgeographic.com/environment/article/cashmere-industry-environmental-impact",
+        "snippet": "Overgrazing by cashmere goats has caused severe land degradation."
+      }
+    ]
   },
 
   "silk": {
@@ -122,35 +188,14 @@
     "biodegradable": true,
     "recyclable": "Limited",
     "certifications": ["GOTS", "OEKO-TEX"],
-    "ecoScore": 14
-  },
-
-  "peace silk": {
-    "displayName": "Peace / Ahimsa Silk",
-    "includes": ["peace silk", "ahimsa silk"],
-    "description": "Silk harvested without killing silkworms",
-    "waterUsage": "High",
-    "chemicalUsage": "High",
-    "carbonImpact": "Moderate",
-    "landImpact": "High",
-    "biodegradable": true,
-    "recyclable": "Limited",
-    "certifications": ["GOTS", "Fair Trade"],
-    "ecoScore": 14
-  },
-
-  "leather": {
-    "displayName": "Leather (Conventional)",
-    "includes": ["leather"],
-    "description": "Animal hides processed with chemical tanning",
-    "waterUsage": "Very high",
-    "chemicalUsage": "Extremely high (chromium tanning)",
-    "carbonImpact": "Extremely high",
-    "landImpact": "Extremely high",
-    "biodegradable": "Limited",
-    "recyclable": "Very limited",
-    "certifications": ["LWG", "ZDHC", "OEKO-TEX"],
-    "ecoScore": 10
+    "ecoScore": 14,
+    "sources": [
+      {
+        "title": "Sustainability of silk",
+        "link": "https://goodonyou.eco/material-guide-silk/",
+        "snippet": "Silk production involves high water use and energy-intensive processing."
+      }
+    ]
   },
 
   "plant-based leather": {
@@ -164,34 +209,13 @@
     "biodegradable": "Mostly",
     "recyclable": "Limited",
     "certifications": ["Piñatex", "MycoWorks", "Desserto"],
-    "ecoScore": 27
-  },
-
-  "recycled polyester": {
-    "displayName": "Recycled Polyester (rPET)",
-    "includes": ["recycled polyester", "rpet"],
-    "description": "Polyester made from recycled plastic waste",
-    "waterUsage": "Lower than virgin polyester",
-    "chemicalUsage": "Lower",
-    "carbonImpact": "Up to 75% lower than virgin polyester",
-    "landImpact": "Low",
-    "biodegradable": false,
-    "recyclable": true,
-    "certifications": ["GRS", "RCS"],
-    "ecoScore": 22
-  },
-
-  "recycled nylon": {
-    "displayName": "Recycled Nylon",
-    "includes": ["recycled nylon", "econyl"],
-    "description": "Regenerated nylon from fishing nets and waste",
-    "waterUsage": "Lower than virgin nylon",
-    "chemicalUsage": "Lower",
-    "carbonImpact": "Lower than virgin nylon",
-    "landImpact": "Low",
-    "biodegradable": false,
-    "recyclable": true,
-    "certifications": ["Econyl", "GRS"],
-    "ecoScore": 22
+    "ecoScore": 27,
+    "sources": [
+      {
+        "title": "Are plant-based leathers sustainable?",
+        "link": "https://www.vogue.com/article/are-plant-based-leathers-sustainable",
+        "snippet": "Plant-based leathers can significantly reduce environmental impact when properly designed."
+      }
+    ]
   }
 }

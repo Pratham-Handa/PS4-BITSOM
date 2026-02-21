@@ -1,159 +1,373 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="light" lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>EcoStyle Agent</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet"/>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: "#19f073",
+            secondary: "#FF0000",
+            "background-light": "#f6f8f7",
+            "surface-light": "#ffffff"
+          },
+          fontFamily: {
+            display: ["Inter", "sans-serif"]
+          }
+        }
+      }
+    }
+  </script>
 </head>
 
-<body class="bg-gray-100 text-gray-900">
+<body class="bg-background-light font-display text-[#111814] antialiased">
 
-<div class="max-w-2xl mx-auto p-6">
+<header class="sticky top-0 z-50 bg-white/80 backdrop-blur border-b px-6 py-3 flex justify-between items-center">
+  <div class="flex items-center gap-2 font-bold text-lg text-primary">
+    <span class="material-symbols-outlined">eco</span> EcoStyle Agent
+  </div>
+  <a href="landing.html"><button class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-9 px-4 bg-primary text-[#111814] text-sm font-bold shadow-sm hover:bg-primary/90 transition-all">
+<span class="truncate">Home</span>
+</button></a>
+</header>
 
-  <!-- HEADER -->
-  <h1 class="text-3xl font-bold text-center mb-1">EcoStyle Agent</h1>
-  <p class="text-center text-gray-600 mb-6">
-    AI-powered sustainability verification for fashion
+<main class="max-w-7xl mx-auto px-6 py-16 space-y-20">
+
+<section class="text-center space-y-6">
+  <h1 class="text-5xl font-black">
+    Welcome to EcoStyle.<br/>
+    <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-green-600">
+      Instantly understand impact.
+    </span>
+  </h1>
+  <p class="max-w-2xl mx-auto text-lg text-gray-600">
+    EcoStyle Agent verifies sustainability claims using explainable AI –
+    anchored datasets, expert models, and authoritative research.
   </p>
+</section>
 
-  <!-- INPUT -->
-  <div class="bg-white p-4 rounded shadow mb-4">
-    <label class="block font-semibold mb-1">Garment Label Text</label>
-    <textarea id="textInput"
-      class="w-full p-3 border rounded mb-3"
-      placeholder="Example: 80% Cotton, 20% Polyester">
-    </textarea>
+<section class="bg-white rounded-2xl shadow p-8 grid md:grid-cols-2 gap-8 relative">
 
-    <label class="block font-semibold mb-1">Or Upload Garment Tag Image</label>
-    <input type="file" id="imageInput" class="mb-3">
+  <!-- IMAGE -->
+  <div>
+    <h3 class="font-bold mb-3">Upload Label Image</h3>
+    <input
+      id="imageInput"
+      type="file"
+      class="w-full border-2 border-dashed rounded-xl p-6 cursor-pointer"
+    />
+  </div>
 
-    <button onclick="analyze()"
-      class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded font-semibold">
-      Analyze Sustainability
+  <!-- TEXT -->
+  <div class="relative">
+    <h3 class="font-bold mb-3">Or Paste Label Text</h3>
+    <textarea
+      id="textInput"
+      class="w-full h-20 rounded-xl border p-4"
+      placeholder="e.g. 80% Cotton, 20% Polyester"
+    ></textarea>
+
+
+  </div>
+
+  <!-- CLEAR BUTTON -->
+  <div class="col-span- flex justify-start">
+    <button
+      onclick="clearInputs()"
+      class="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-2 rounded-lg transition-colors"
+    >
+      Clear
+    </button>
+        <button
+      onclick="analyze()"
+      class="absolute  right-4 bg-primary text-black font-bold px-6 py-2 rounded-lg"
+    >
+      Analyze
     </button>
   </div>
 
-  <!-- RESULT -->
-  <div id="result" class="hidden bg-white p-5 rounded shadow">
+  <p id="loading" class="hidden text-sm text-gray-500 col-span-2">
+    Analyzing… triangulating evidence across datasets
+  </p>
 
-    <!-- SCORE -->
-    <div class="text-center mb-4">
-      <div class="text-5xl font-bold" id="score"></div>
-      <div class="text-gray-700 mt-1" id="summary"></div>
-      <div class="text-sm text-gray-500 mt-1">
-        EcoScore (Lifecycle Index, out of 30)
-      </div>
-    </div>
+  <p id="error" class="hidden text-sm text-red-600 col-span-2"></p>
+</section>
 
-    <!-- TIP -->
-    <div id="tip" class="bg-green-50 text-green-900 p-3 rounded text-sm mb-4"></div>
 
-    <!-- TOGGLE -->
-    <button onclick="toggleExplain()"
-      class="text-sm text-blue-600 underline mb-2">
-      How did EcoStyle arrive at this?
-    </button>
+<section id="results" class="hidden space-y-12">
 
-    <!-- EXPLAINABILITY -->
-    <div id="explain" class="hidden text-sm bg-gray-50 p-4 rounded space-y-3">
+<div class="grid md:grid-cols-3 gap-6">
+  <div class="bg-white rounded-xl shadow p-6 text-center">
+    <div id="ecoScore" class="text-5xl font-black">--</div>
+    <div id="summary" class="mt-2 font-semibold"></div>
+    <div class="text-xs text-gray-500">EcoScore (Lifecycle Index, 0–30)</div>
+  </div>
 
-      <div>
-        <p class="font-semibold">Anchor Pillar (Fiber Dataset)</p>
-        <div id="materials" class="text-gray-700"></div>
-      </div>
+  <div class="bg-white rounded-xl shadow p-6">
+    <p class="font-semibold mb-2">AI Recommendation</p>
+    <p id="recommendation" class="text-sm text-gray-700"></p>
+  </div>
 
-      <div>
-        <p class="font-semibold">EnvironmentalBERT (Claim Detection)</p>
-        <div id="bert" class="text-gray-700"></div>
-      </div>
-
-      <div>
-        <p class="font-semibold">Web Verification (External Sources)</p>
-        <div id="web" class="text-gray-700"></div>
-      </div>
-
-      <div>
-        <p class="font-semibold">System Notes</p>
-        <div id="system" class="text-gray-700"></div>
-      </div>
-
-    </div>
+  <div class="bg-white rounded-xl shadow p-6">
+    <p class="font-semibold mb-2">Greenwashing Risk</p>
+    <p id="greenwash" class="font-bold"></p>
   </div>
 </div>
 
-<script>
-const BACKEND_URL = "https://ps4-bitsom.onrender.com";
+<div class="grid md:grid-cols-3 gap-6">
+  <div class="bg-white rounded-xl shadow p-6">
+    <p class="font-semibold mb-3">Materials Detected</p>
+    <ul id="materialsList" class="space-y-2 text-sm"></ul>
+  </div>
 
-function toggleExplain() {
-  document.getElementById("explain").classList.toggle("hidden");
+  <div class="bg-white rounded-xl shadow p-6">
+    <p class="font-semibold mb-3">Claim Analysis (EnvironmentalBERT)</p>
+    <div id="bertAnalysis" class="text-sm"></div>
+  </div>
+
+  <div class="bg-white rounded-xl shadow p-6">
+    <p class="font-semibold mb-3">Authoritative Evidence</p>
+    <div id="sources" class="space-y-2 text-sm"></div>
+  </div>
+</div>
+
+<div class="bg-white rounded-xl shadow p-6">
+  <p class="font-semibold mb-2">How This Score Was Generated</p>
+  <p id="explainScore" class="text-sm text-gray-700 leading-relaxed"></p>
+</div>
+
+<!-- ✅ UPDATED SECTION -->
+<details class="bg-white rounded-xl shadow p-6 text-sm">
+  <summary class="font-semibold cursor-pointer">
+    🔍 System Reasoning (Explainability)
+  </summary>
+
+  <pre
+    id="systemLogs"
+    class="mt-4 bg-gray-50 p-4 rounded text-xs text-gray-700 whitespace-pre-wrap"
+  >
+Waiting for analysis…
+  </pre>
+</details>
+
+
+</section>
+</main>
+<script>
+function render(data) {
+  // === SYSTEM LOGS ===
+const logs = [];
+
+logs.push("🧠 Agent reasoning started");
+logs.push(`📄 Input text: ${data.extractedText}`);
+
+logs.push(`🌱 Environmental claim detected: ${data.environmentalBert?.environmentalClaim ?? false}`);
+
+if (data.materials && data.materials.length) {
+  const avg =
+    data.materials.reduce((s, m) => s + m.ecoScore, 0) /
+    data.materials.length;
+  logs.push(`📐 Anchor average score: ${avg.toFixed(1)}`);
 }
+
+logs.push(`📊 Final EcoScore: ${data.overallScore}/30`);
+logs.push(`🔎 Market sources returned: ${data.webVerification?.length ?? 0}`);
+
+document.getElementById("systemLogs").textContent =
+  logs.join("\n");
+  document.getElementById("results").classList.remove("hidden");
+
+  document.getElementById("ecoScore").textContent =
+    data.overallScore ?? "--";
+
+  document.getElementById("summary").textContent =
+    data.summary ?? "—";
+
+  document.getElementById("recommendation").textContent =
+    data.recommendation ?? "—";
+// ================== GREENWASH RISK ==================
+document.getElementById("greenwash").textContent =
+  (data.environmentalBert?.environmentalClaim && data.overallScore < 18)
+    ? "High Risk"
+    : data.overallScore < 20
+    ? "Medium Risk"
+    : "Low Risk";
+
+
+// ================== MATERIALS ==================
+const mats = document.getElementById("materialsList");
+
+if (Array.isArray(data.materials) && data.materials.length > 0) {
+  mats.innerHTML = data.materials
+    .map(m => `<li>• ${m.name} — ${m.ecoScore}/30</li>`)
+    .join("");
+
+  // OPTIONAL filler explanation (prevents empty space)
+  if (!document.getElementById("materialsNote")) {
+    mats.insertAdjacentHTML(
+      "afterend",
+      `<p id="materialsNote" class="mt-3 text-xs text-gray-600 leading-relaxed">
+        These materials were matched against lifecycle datasets evaluating
+        water use, chemical intensity, and end-of-life impact.
+      </p>`
+    );
+  }
+
+} else {
+  mats.innerHTML = "<li>No materials confidently detected.</li>";
+}
+
+
+// ================== BERT CLAIM ANALYSIS ==================
+const bertBox = document.getElementById("bertAnalysis");
+
+if (Array.isArray(data.environmentalBert?.raw) && data.environmentalBert.raw.length > 0) {
+  bertBox.innerHTML = data.environmentalBert.raw
+    .map(r => `• ${r.label}: ${(r.score * 100).toFixed(1)}%`)
+    .join("<br>");
+
+  // OPTIONAL filler explanation
+  if (!document.getElementById("claimNote")) {
+    bertBox.insertAdjacentHTML(
+      "afterend",
+      `<p id="claimNote" class="mt-3 text-xs text-gray-600 leading-relaxed">
+        EnvironmentalBERT evaluates whether sustainability-related language
+        appears on the label and how confidently it can be classified.
+      </p>`
+    );
+  }
+
+} else {
+  bertBox.textContent = "No sustainability claims detected.";
+
+  if (!document.getElementById("claimNote")) {
+    bertBox.insertAdjacentHTML(
+      "afterend",
+      `<p id="claimNote" class="mt-3 text-xs text-gray-600 leading-relaxed">
+        No marketing or environmental claims were found in the provided text.
+        This typically indicates neutral labeling.
+      </p>`
+    );
+  }
+}
+
+
+  // Sources
+  const src = document.getElementById("sources");
+
+if (!data.webVerification || data.webVerification.length === 0) {
+  src.innerHTML = "Verified against internal sustainability datasets.";
+} else {
+  src.innerHTML = data.webVerification
+    .map(s => `
+      <a
+        href="${s.link}"
+        target="_blank"
+        class="block text-blue-600 underline hover:text-blue-800"
+      >
+        ${s.title}
+      </a>
+      <p class="text-xs text-gray-500 mb-2">
+        ${s.snippet ?? ""}
+      </p>
+    `)
+    .join("");
+}
+
+
+  // Explain
+  document.getElementById("explainScore").textContent =
+    `The EcoScore was calculated using lifecycle impact scores of detected materials
+     and domain-specific AI verification. The result represents a deterministic,
+     explainable sustainability assessment.`;
+
+// ✅ Smooth scroll with offset for sticky header
+const resultsSection = document.getElementById("results");
+const headerOffset = 96; // px — adjust if needed (navbar height)
+const elementPosition = resultsSection.getBoundingClientRect().top;
+const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+window.scrollTo({
+  top: offsetPosition,
+  behavior: "smooth"
+});
+
+
+}
+
+
+function clearInputs() {
+  // Clear text
+  document.getElementById("textInput").value = "";
+
+  // Clear image
+  const imageInput = document.getElementById("imageInput");
+  imageInput.value = "";
+
+  // Hide loading & error
+  document.getElementById("loading").classList.add("hidden");
+  document.getElementById("error").classList.add("hidden");
+
+  // Hide results if present
+  const results = document.getElementById("results");
+  if (results) {
+    results.classList.add("hidden");
+  }
+}
+
+</script>
+
+<script>
+const BACKEND = "http://127.0.0.1:5000";
 
 async function analyze() {
   const text = document.getElementById("textInput").value.trim();
   const image = document.getElementById("imageInput").files[0];
+  const loading = document.getElementById("loading");
+  const error = document.getElementById("error");
 
-  let response;
+  error.classList.add("hidden");
+  loading.textContent = "Analyzing… triangulating evidence across datasets";
+  loading.classList.remove("hidden");
 
-  if (image) {
-    const formData = new FormData();
-    formData.append("image", image);
+  try {
+    let res;
 
-    response = await fetch(`${BACKEND_URL}/analyze-image`, {
-      method: "POST",
-      body: formData
-    });
-  } else {
-    response = await fetch(`${BACKEND_URL}/analyze`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text })
-    });
+    if (image) {
+      const fd = new FormData();
+      fd.append("image", image);
+      res = await fetch(`${BACKEND}/analyze-image`, { method: "POST", body: fd });
+    } else {
+      res = await fetch(`${BACKEND}/analyze`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text })
+      });
+    }
+
+    if (!res.ok) {
+      throw new Error("Backend responded with error");
+    }
+
+    const data = await res.json();
+    render(data);
+
+  } catch (err) {
+    console.error("Frontend error:", err);
+    error.textContent = "Something went wrong while displaying results.";
+    error.classList.remove("hidden");
+  } finally {
+    loading.classList.add("hidden");
   }
-
-  const data = await response.json();
-  document.getElementById("result").classList.remove("hidden");
-
-  // SCORE
-  document.getElementById("score").innerText =
-    data.overallScore + "/30";
-
-  document.getElementById("summary").innerText = data.summary;
-  document.getElementById("tip").innerText = "💡 " + data.recommendation;
-
-  // MATERIALS
-  document.getElementById("materials").innerHTML =
-    data.materials.length
-      ? data.materials.map(m =>
-          `• ${m.name} (Anchor EcoScore: ${m.ecoScore}/30)`
-        ).join("<br>")
-      : "No materials confidently detected";
-
-  // ENVIRONMENTALBERT
-  if (data.environmentalBert.environmentalClaim) {
-    document.getElementById("bert").innerHTML =
-      data.environmentalBert.raw.map(r =>
-        `• Sustainability claim confidence: ${(r.score * 100).toFixed(1)}%`
-      ).join("<br>");
-  } else {
-    document.getElementById("bert").innerText =
-      "No sustainability marketing claim detected in the label text.";
-  }
-
-  // WEB VERIFICATION
-  document.getElementById("web").innerHTML =
-    data.webVerification.length
-      ? data.webVerification.map(w =>
-          `• <a href="${w.link}" target="_blank"
-              class="text-blue-600 underline">${w.title}</a><br>
-            <span class="text-gray-600">${w.snippet}</span>`
-        ).join("<br><br>")
-      : "No external sources required for this analysis.";
-
-  // SYSTEM NOTES
-  document.getElementById("system").innerHTML =
-    `OCR Fallback Used: ${data.fallbackUsed}<br>
-     ${data.fallbackReason || ""}`;
 }
 </script>
 
